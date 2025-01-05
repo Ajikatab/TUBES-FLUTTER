@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'db_helper.dart';
 
 class ShopScreen extends StatefulWidget {
+  const ShopScreen({super.key});
+
   @override
   _ShopScreenState createState() => _ShopScreenState();
 }
@@ -38,15 +40,15 @@ class _ShopScreenState extends State<ShopScreen> {
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(labelText: 'Name'),
             ),
             TextField(
               controller: descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
+              decoration: const InputDecoration(labelText: 'Description'),
             ),
             TextField(
               controller: priceController,
-              decoration: InputDecoration(labelText: 'Price'),
+              decoration: const InputDecoration(labelText: 'Price'),
               keyboardType: TextInputType.number,
             ),
           ],
@@ -54,7 +56,7 @@ class _ShopScreenState extends State<ShopScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -102,14 +104,14 @@ class _ShopScreenState extends State<ShopScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shop Management'),
+        title: const Text('Shop Management'),
       ),
       body: ListView.builder(
         itemCount: _products.length,
         itemBuilder: (ctx, index) {
           final product = _products[index];
           return Card(
-            margin: EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
             child: ListTile(
               title: Text(product['name']),
               subtitle: Text('Price: \$${product['price']}'),
@@ -117,11 +119,11 @@ class _ShopScreenState extends State<ShopScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.edit),
+                    icon: const Icon(Icons.edit),
                     onPressed: () => _showProductDialog(product: product),
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete),
+                    icon: const Icon(Icons.delete),
                     onPressed: () => _deleteProduct(product['id']),
                   ),
                 ],
@@ -132,7 +134,7 @@ class _ShopScreenState extends State<ShopScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showProductDialog(),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

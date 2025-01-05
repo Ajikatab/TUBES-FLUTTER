@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart'; // Ganti dengan rute login screen yang sesuai
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -16,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   // Fungsi untuk mengarahkan pengguna ke halaman login setelah 3 detik
   _navigateToLogin() async {
     await Future.delayed(
-        Duration(seconds: 3)); // Tampilkan splash screen selama 3 detik
+        const Duration(seconds: 3)); // Tampilkan splash screen selama 3 detik
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -26,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.blue, // Warna latar belakang splash screen
       body: Center(
         child: Column(
