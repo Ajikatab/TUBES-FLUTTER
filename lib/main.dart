@@ -3,7 +3,7 @@ import 'splash_screen.dart'; // Import splash screen
 import 'login_screen.dart'; // Import login screen
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -18,10 +18,10 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(), // Halaman pertama yang muncul adalah SplashScreen
+      home: const SplashScreen(), // Halaman pertama yang muncul adalah SplashScreen
       routes: {
         '/login': (context) =>
-            LoginScreen(), // Menambahkan rute untuk halaman login
+            const LoginScreen(), // Menambahkan rute untuk halaman login
         // Rute lainnya bisa ditambahkan di sini, misalnya '/home', '/admin', dll.
       },
     );

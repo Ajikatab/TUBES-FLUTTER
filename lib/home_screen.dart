@@ -3,6 +3,7 @@ import 'movie_detail_screen.dart';
 import 'movie.dart';
 import 'movie_api.dart';
 import 'shop_screen.dart';
+import 'category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,34 +24,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onItemTapped(int index) {
+    if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const CategoryScreen()),
+      );
+      return;
+    }
+
     if (index == 2) {
-      // Jika tombol Shop ditekan (index 2)
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const ShopScreen()),
       );
       return;
     }
-    
-    setState(() {
-      _selectedIndex = index;
-      _currentPage = 1; // Reset halaman saat tab berubah
-      movies = MovieApi.fetchMovies(); // Muat ulang film
-    });
+
+    if (mounted) {
+      setState(() {
+        _selectedIndex = index;
+        _currentPage = 1;
+        movies = MovieApi.fetchMovies();
+      });
+    }
   }
 
   void _loadNextPage() {
-    setState(() {
-      _currentPage++;
-      movies = MovieApi.fetchMovies(); // Hapus parameter page karena belum didefinisikan
-    });
+    if (mounted) {
+      setState(() {
+        _currentPage++;
+        movies = MovieApi.fetchMovies();
+      });
+    }
   }
 
   void _loadPreviousPage() {
-    if (_currentPage > 1) {
+    if (_currentPage > 1 && mounted) {
       setState(() {
         _currentPage--;
-        movies = MovieApi.fetchMovies(); // Hapus parameter page karena belum didefinisikan
+        movies = MovieApi.fetchMovies();
       });
     }
   }
@@ -75,12 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: Colors.black87,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.amber),
-            onPressed: () {},
-          ),
-        ],
       ),
       backgroundColor: Colors.black87,
       body: Column(
@@ -91,9 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _selectedIndex == 0 ? 'Now Showing' : 
-                  _selectedIndex == 1 ? 'Category' : 
-                  'Shop',
+                  _selectedIndex == 0
+                      ? 'Now Showing'
+                      : _selectedIndex == 1
+                          ? 'Category'
+                          : 'Shop',
                   style: const TextStyle(
                     color: Colors.amber,
                     fontSize: 22,
@@ -147,12 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   List<Movie> movieList = snapshot.data!;
 
                   return GridView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.65,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.7,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
                     ),
                     itemCount: movieList.length,
                     itemBuilder: (context, index) {
@@ -174,12 +182,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.grey[900],
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.amber.withOpacity(0.3),
+                                color: Colors.amber.withOpacity(0.2),
                                 spreadRadius: 1,
-                                blurRadius: 5,
+                                blurRadius: 3,
                               ),
                             ],
                           ),
@@ -187,51 +195,34 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Expanded(
-                                flex: 5,
+                                flex: 4,
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(15),
+                                    top: Radius.circular(12),
                                   ),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      Image.network(
-                                        movie.posterUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey[800],
-                                            child: const Icon(
-                                              Icons.error,
-                                              color: Colors.amber,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black.withOpacity(0.7),
-                                            ],
-                                          ),
+                                  child: Image.network(
+                                    movie.posterUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[800],
+                                        child: const Icon(
+                                          Icons.error,
+                                          color: Colors.amber,
                                         ),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.all(12),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
                                 child: Text(
                                   movie.title,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -251,27 +242,25 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        backgroundColor: Colors.black87,
+        selectedItemColor: Colors.amber,
+        unselectedItemColor: Colors.white70,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.movie),
+            icon: Icon(Icons.movie_outlined),
             label: 'Now Showing',
-            backgroundColor: Colors.black87,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.category),
+            icon: Icon(Icons.category_outlined),
             label: 'Category',
-            backgroundColor: Colors.black87,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: Icon(Icons.shopping_cart_outlined),
             label: 'Shop',
-            backgroundColor: Colors.black87,
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
       ),
     );
   }

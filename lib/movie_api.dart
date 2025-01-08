@@ -6,7 +6,7 @@ class MovieApi {
   static Future<List<Movie>> fetchMovies() async {
     // URL TMDB API untuk mengambil daftar film terbaru
     const url =
-        'https://api.themoviedb.org/3/movie/now_playing?api_key=40e32983b0bc5a9d24bce1ff7c45fa1a&page=2';
+        'https://api.themoviedb.org/3/movie/now_playing?api_key=40e32983b0bc5a9d24bce1ff7c45fa1a&page=1';
 
     final response = await http.get(
       Uri.parse(url),

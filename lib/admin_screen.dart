@@ -29,7 +29,7 @@ class AdminScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ShopScreen(),
+                    builder: (context) => const ShopScreen(),
                   ),
                 );
               },
