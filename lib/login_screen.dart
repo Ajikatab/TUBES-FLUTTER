@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'admin_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,12 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordController.text;
 
     if (_formKey.currentState?.validate() ?? false) {
-      if (username == 'admin' && password == 'admin123') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminScreen()),
-        );
-      } else if (username == 'customer' && password == 'customer123') {
+      if (username == 'p' && password == 'p1') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -50,31 +44,31 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black87, Colors.grey[900]!],
+            colors: [const Color(0xFF1E1E1E), Colors.grey[900]!],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                padding: const EdgeInsets.all(24.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.movie,
                         size: 100,
-                        color: Colors.amber,
+                        color: Colors.grey[300],
                       ),
                       const SizedBox(height: 24),
-                      const Text(
-                        'Cinema App',
+                      Text(
+                        'Silver Screen Saga',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Colors.amber,
+                          color: Colors.grey[300],
                         ),
                       ),
                       const SizedBox(height: 48),
@@ -157,8 +151,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.login, color: Colors.black),
-                                      SizedBox(width: 8),
                                       Text(
                                         'Login',
                                         style: TextStyle(

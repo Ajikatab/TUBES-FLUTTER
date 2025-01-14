@@ -16,10 +16,22 @@ class MovieDetailScreen extends StatelessWidget {
   });
 
   Future<void> _launchURL() async {
+    // Log the URL for debugging purposes
+    print('Attempting to launch URL: $trailerLink');
+
+    // Ensure the trailerLink is not empty
+    if (trailerLink.isEmpty) {
+      print('No trailer link available.');
+      return;
+    }
+
     final Uri url = Uri.parse(trailerLink);
+
+    // Check if the URL can be launched
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
+      print('Could not launch URL: $trailerLink');
       throw 'Could not launch $trailerLink';
     }
   }
@@ -27,7 +39,7 @@ class MovieDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87,
+      backgroundColor: const Color(0xFF1E1E1E),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -41,18 +53,18 @@ class MovieDetailScreen extends StatelessWidget {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(Icons.arrow_back, color: Colors.amber),
+                child: Icon(Icons.arrow_back, color: Colors.grey[300]),
               ),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.amber,
+                style: TextStyle(
+                  color: Colors.grey[300],
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  shadows: [
+                  shadows: const [
                     Shadow(
                       blurRadius: 12.0,
                       color: Colors.black,
@@ -134,15 +146,15 @@ class MovieDetailScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            const Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.description,
                                   color: Colors.amber,
                                   size: 28,
                                 ),
-                                const SizedBox(width: 10),
-                                const Text(
+                                SizedBox(width: 10),
+                                Text(
                                   'Synopsis',
                                   style: TextStyle(
                                     fontSize: 26,
@@ -176,7 +188,7 @@ class MovieDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: InkWell(
-                      onTap: _launchURL,
+                      onTap: _launchURL, // This will launch the trailer link
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
                         decoration: BoxDecoration(

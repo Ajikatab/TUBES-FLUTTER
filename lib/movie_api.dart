@@ -1,25 +1,28 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'movie.dart'; // Pastikan model Movie sudah ada
+import 'package:http/http.dart' as http;
+import 'movie.dart';
 
 class MovieApi {
-  static Future<List<Movie>> fetchMovies() async {
-    // URL TMDB API untuk mengambil daftar film terbaru
-    const url =
-        'https://api.themoviedb.org/3/movie/now_playing?api_key=40e32983b0bc5a9d24bce1ff7c45fa1a&page=1';
+  // Replace with your actual API key
+  static const String apiKey = '40e32983b0bc5a9d24bce1ff7c45fa1a';
+  static const String apiUrl = 'https://api.themoviedb.org/3/movie/';
 
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MGUzMjk4M2IwYmM1YTlkMjRiY2UxZmY3YzQ1ZmExYSIsIm5iZiI6MTY4NDk5NTEwMS4xODcsInN1YiI6IjY0NmVmYzFkZTIyZDI4MTZiMDk0NWIxNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.l8UN7wbrGd5IMcIZbFvBqG3QjYf5k0Gk46nb_q35374', // Ganti dengan Bearer Token Anda
-      },
-    );
+  // Fetch movies based on 'page' and 'category' parameters
+  static Future<List<Movie>> fetchMovies({int page = 1, String category = 'now_playing'}) async {
+    final url = Uri.parse('$apiUrl$category?api_key=$apiKey&page=$page');
+    final response = await http.get(url);
+
+    print('Fetching movies from: $url');
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body)['results'];
-      return data.map((json) => Movie.fromJson(json)).toList();
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      List<dynamic> jsonData = jsonResponse['results']; // 'results' contains the list of movies
+      return jsonData.map((movie) => Movie.fromJson(movie)).toList();
     } else {
+      // Log the error
+      print('Error fetching movies: ${response.statusCode} - ${response.body}');
       throw Exception('Failed to load movies');
     }
   }

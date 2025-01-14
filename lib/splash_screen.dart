@@ -56,16 +56,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87,
+      backgroundColor: const Color(0xFF1E1E1E),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black87,
-              Colors.amber.withOpacity(0.3),
-              Colors.black87,
+              const Color(0xFF1E1E1E),
+              Colors.grey[800]!.withOpacity(0.3),
+              const Color(0xFF1E1E1E),
             ],
           ),
         ),
@@ -83,40 +83,40 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.amber.withOpacity(0.5),
+                          color: Colors.grey[400]!.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 15,
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.movie_creation,
                       size: 120,
-                      color: Colors.amber,
+                      color: Colors.grey[300],
                     ),
                   ),
                   const SizedBox(height: 30),
                   const Text(
-                    'CineStream',
+                    'Silver Screen Saga',
                     style: TextStyle(
                       fontSize: 36,
-                      color: Colors.amber,
+                      color: Color(0xFFE0E0E0),
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Your Ultimate Movie Experience',
+                  Text(
+                    'Your Premium Cinema Experience',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: Colors.grey[400],
                       letterSpacing: 1,
                     ),
                   ),
                   const SizedBox(height: 40),
-                  const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[300]!),
                   ),
                 ],
               ),
