@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'news_api.dart';
 import 'news_detail.dart';
 
@@ -15,14 +14,29 @@ class _NewsScreenState extends State<NewsScreen> {
   String selectedSource = 'antara'; // Default news source
   String selectedCategory = 'terbaru'; // Default category
 
+  // Define categories for each source
+  final Map<String, List<String>> categories = {
+    'antara': ['terbaru', 'politik', 'hukum', 'ekonomi', 'bola', 'olahraga', 'humaniora', 'lifestyle', 'hiburan', 'dunia', 'tekno', 'otomotif'],
+    'cnbc': ['terbaru', 'investment', 'news', 'market', 'entrepreneur', 'syariah', 'tech', 'lifestyle', 'opini', 'profil'],
+    'cnn': ['terbaru', 'nasional', 'internasional', 'ekonomi', 'olahraga', 'teknologi', 'hiburan', 'gayahidup'],
+    'jpnn': ['terbaru'],
+    'kumparan': ['terbaru'],
+    'merdeka': ['terbaru', 'jakarta', 'dunia', 'gaya', 'olahraga', 'teknologi', 'otomotif', 'khas', 'sehat', 'jateng'],
+    'okezone': ['terbaru', 'celebrity', 'sports', 'otomotif', 'economy', 'techno', 'lifestyle', 'bola'],
+    'republika': ['terbaru', 'news', 'daerah', 'khazanah', 'islam', 'internasional', 'bola', 'leisure'],
+    'sindonews': ['terbaru', 'nasional', 'metro', 'ekbis', 'international', 'daerah', 'sports', 'otomotif', 'tekno', 'sains', 'edukasi', 'lifestyle', 'kalam'],
+  };
+
   @override
   void initState() {
     super.initState();
     _fetchNews();
   }
 
-  // Fetch news based on selected source and category
   void _fetchNews() {
+    if (!categories[selectedSource]!.contains(selectedCategory)) {
+      selectedCategory = categories[selectedSource]![0];
+    }
     setState(() {
       newsArticles = NewsApi().fetchNews(selectedSource, selectedCategory);
     });
@@ -31,6 +45,14 @@ class _NewsScreenState extends State<NewsScreen> {
   // Refresh the news articles
   Future<void> _onRefresh() async {
     _fetchNews(); // Refresh the news by fetching the data again
+  }
+
+  void _updateCategory(String source) {
+    setState(() {
+      if (!categories[source]!.contains(selectedCategory)) {
+        selectedCategory = categories[source]![0]; // Set ke kategori pertama jika tidak valid
+      }
+    });
   }
 
   @override
@@ -65,7 +87,7 @@ class _NewsScreenState extends State<NewsScreen> {
                       onChanged: (value) {
                         setState(() {
                           selectedSource = value!;
-                          selectedCategory = 'terbaru'; // Reset category
+                          _updateCategory(selectedSource); // Ensure category is valid
                           _fetchNews();
                         });
                       },
@@ -92,7 +114,9 @@ class _NewsScreenState extends State<NewsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: DropdownButton<String>(
-                      value: selectedCategory,
+                      value: categories[selectedSource]!.contains(selectedCategory) 
+                            ? selectedCategory 
+                            : categories[selectedSource]![0],
                       dropdownColor: Colors.grey[800],
                       style: const TextStyle(color: Colors.white),
                       icon: const Icon(Icons.arrow_drop_down, color: Colors.amber),
@@ -103,14 +127,12 @@ class _NewsScreenState extends State<NewsScreen> {
                           _fetchNews();
                         });
                       },
-                      items: const [
-                        DropdownMenuItem(value: 'terbaru', child: Text('Latest')),
-                        DropdownMenuItem(value: 'politik', child: Text('Politics')),
-                        DropdownMenuItem(value: 'ekonomi', child: Text('Economy')),
-                        DropdownMenuItem(value: 'hukum', child: Text('Law')),
-                        DropdownMenuItem(value: 'teknologi', child: Text('Technology')),
-                        DropdownMenuItem(value: 'olahraga', child: Text('Sports')),
-                      ],
+                      items: categories[selectedSource]!
+                          .map((category) => DropdownMenuItem<String>(
+                                value: category,
+                                child: Text(category),
+                              ))
+                          .toList(),
                     ),
                   ),
                 ),
@@ -220,25 +242,6 @@ class _NewsScreenState extends State<NewsScreen> {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: CurvedNavigationBar(
-        index: 1, // Set the initial index for 'News' screen
-        height: 60.0,
-        items: const <Widget>[
-          Icon(Icons.movie, size: 30, color: Colors.white),
-          Icon(Icons.newspaper, size: 30, color: Colors.white),
-          Icon(Icons.info, size: 30, color: Colors.white),
-        ],
-        color: const Color(0xFF1E1E1E), // Background color of the navigation bar
-        backgroundColor: Colors.transparent, // Transparent background
-        buttonBackgroundColor: Colors.amber, // Selected button background color
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushReplacementNamed(context, '/home');
-          } else if (index == 2) {
-            Navigator.pushReplacementNamed(context, '/about');
-          }
-        },
       ),
     );
   }

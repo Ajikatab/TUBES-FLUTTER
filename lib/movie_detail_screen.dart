@@ -1,40 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MovieDetailScreen extends StatelessWidget {
   final String title;
   final String synopsis;
-  final String trailerLink;
   final String posterUrl;
+  final String releaseDate;
+  final double? voteAverage; // Biarkan nullable jika diperlukan
+  final int runtime; // Tambahkan runtime
+  final List<String> genres; // Tambahkan genres
 
   const MovieDetailScreen({
     super.key,
     required this.title,
     required this.synopsis,
-    required this.trailerLink,
     required this.posterUrl,
+    required this.releaseDate,
+    this.voteAverage, // Biarkan nullable
+    required this.runtime, // Wajib
+    required this.genres, // Wajib
   });
-
-  Future<void> _launchURL() async {
-    // Log the URL for debugging purposes
-    print('Attempting to launch URL: $trailerLink');
-
-    // Ensure the trailerLink is not empty
-    if (trailerLink.isEmpty) {
-      print('No trailer link available.');
-      return;
-    }
-
-    final Uri url = Uri.parse(trailerLink);
-
-    // Check if the URL can be launched
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      print('Could not launch URL: $trailerLink');
-      throw 'Could not launch $trailerLink';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,171 +100,43 @@ class MovieDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Card(
-                    elevation: 12,
-                    color: Colors.grey[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.grey[900]!,
-                            Colors.grey[850]!,
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.amber.withOpacity(0.4),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              children: [
-                                Icon(
-                                  Icons.description,
-                                  color: Colors.amber,
-                                  size: 28,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  'Synopsis',
-                                  style: TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.amber,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              synopsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                height: 1.6,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                              textAlign: TextAlign.justify,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  // Release Date
+                  _buildDetailCard(
+                    icon: Icons.calendar_today,
+                    title: 'Release Date',
+                    content: releaseDate,
                   ),
                   const SizedBox(height: 24),
-                  Card(
-                    elevation: 12,
-                    color: Colors.grey[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: InkWell(
-                      onTap: _launchURL, // This will launch the trailer link
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Colors.grey[900]!,
-                              Colors.grey[850]!,
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.amber.withOpacity(0.4),
-                              spreadRadius: 1,
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            children: [
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.movie,
-                                    color: Colors.amber,
-                                    size: 28,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Watch Trailer',
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.amber,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                  horizontal: 30,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Colors.amber,
-                                      Color(0xFFFFB74D),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.amber.withOpacity(0.4),
-                                      spreadRadius: 2,
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.play_circle_filled,
-                                      color: Colors.black87,
-                                      size: 32,
-                                    ),
-                                    SizedBox(width: 12),
-                                    Text(
-                                      'Play Trailer',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+
+                  // Rating
+                  _buildDetailCard(
+                    icon: Icons.star,
+                    title: 'Rating',
+                    content: voteAverage != null ? '$voteAverage/10' : 'N/A',
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Runtime
+                  _buildDetailCard(
+                    icon: Icons.timer,
+                    title: 'Runtime',
+                    content: '$runtime minutes', // Tampilkan runtime
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Genres
+                  _buildDetailCard(
+                    icon: Icons.category,
+                    title: 'Genres',
+                    content: genres.join(', '), // Tampilkan genres
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Synopsis
+                  _buildDetailCard(
+                    icon: Icons.description,
+                    title: 'Synopsis',
+                    content: synopsis,
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -288,6 +144,78 @@ class MovieDetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Helper method to build a detail card
+  Widget _buildDetailCard({
+    required IconData icon,
+    required String title,
+    required String content,
+  }) {
+    return Card(
+      elevation: 12,
+      color: Colors.grey[900],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.grey[900]!,
+              Colors.grey[850]!,
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.amber.withOpacity(0.4),
+              spreadRadius: 1,
+              blurRadius: 8,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: Colors.amber,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 16,
+                  height: 1.6,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
