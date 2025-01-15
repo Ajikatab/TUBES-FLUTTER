@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'db_helper.dart';
-// import 'home_screen.dart';
 import 'detail_merch.dart';
 
 class ShopPelangganScreen extends StatefulWidget {
@@ -11,21 +9,21 @@ class ShopPelangganScreen extends StatefulWidget {
 }
 
 class _ShopPelangganScreenState extends State<ShopPelangganScreen> {
-  List<Map<String, dynamic>> _products = [];
+  final List<Map<String, dynamic>> _products = [
+    {
+      'name': 'Product 1',
+      'description': 'Description of Product 1',
+      'price': 100000,
+      'imageUrl': 'https://via.placeholder.com/150',
+    },
+    {
+      'name': 'Product 2',
+      'description': 'Description of Product 2',
+      'price': 150000,
+      'imageUrl': 'https://via.placeholder.com/150',
+    },
+  ];
   final int _currentIndex = 1;
-
-  void _loadProducts() async {
-    final data = await DBHelper.getProducts();
-    setState(() {
-      _products = data;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,53 +1,68 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'register_screen.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final _auth = FirebaseAuth.instance;
 
-  void _login() async {
+  void _register() async {
     String email = _emailController.text;
     String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
 
     if (_formKey.currentState?.validate() ?? false) {
-      try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+      if (password == confirmPassword) {
+        try {
+          // Mendaftarkan pengguna menggunakan Firebase Auth
+          UserCredential userCredential =
+              await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
 
-        // If login is successful, navigate to HomeScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } on FirebaseAuthException catch (e) {
+          // Menyimpan data pengguna ke Firestore
+          FirebaseFirestore.instance
+              .collection('user')
+              .doc(userCredential.user?.uid)
+              .set({
+            'email': email,
+            'created_at': FieldValue.serverTimestamp(),
+          });
+
+          // Setelah berhasil registrasi, arahkan ke halaman login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        } on FirebaseAuthException catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message ?? 'Terjadi kesalahan'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message ?? 'Login Failed'),
+          const SnackBar(
+            content: Text('Password dan Konfirmasi Password tidak sama!'),
             backgroundColor: Colors.red,
           ),
         );
       }
     }
-  }
-
-  void _navigateToRegister() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const RegisterScreen()),
-    );
   }
 
   @override
@@ -105,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   labelText: 'Email',
                                   labelStyle:
                                       const TextStyle(color: Colors.amber),
-                                  prefixIcon: const Icon(Icons.email,
+                                  prefixIcon: const Icon(Icons.person,
                                       color: Colors.amber),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -125,7 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (value == null || value.isEmpty) {
                                     return 'Email tidak boleh kosong';
                                   }
-                                  // You can also validate the email format here if needed
                                   return null;
                                 },
                               ),
@@ -161,12 +175,44 @@ class _LoginScreenState extends State<LoginScreen> {
                                   return null;
                                 },
                               ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _confirmPasswordController,
+                                style: const TextStyle(color: Colors.white),
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Konfirmasi Password',
+                                  labelStyle:
+                                      const TextStyle(color: Colors.amber),
+                                  prefixIcon: const Icon(Icons.lock,
+                                      color: Colors.amber),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide:
+                                        const BorderSide(color: Colors.amber),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(
+                                        color: Colors.amber, width: 2),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Konfirmasi Password tidak boleh kosong';
+                                  }
+                                  return null;
+                                },
+                              ),
                               const SizedBox(height: 24),
                               SizedBox(
                                 width: double.infinity,
                                 height: 50,
                                 child: ElevatedButton(
-                                  onPressed: _login,
+                                  onPressed: _register,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.amber,
                                     shape: RoundedRectangleBorder(
@@ -177,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Login',
+                                        'Register',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -186,14 +232,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ],
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              GestureDetector(
-                                onTap: _navigateToRegister,
-                                child: const Text(
-                                  'Belum punya akun? Daftar di sini',
-                                  style: TextStyle(color: Colors.amber),
                                 ),
                               ),
                             ],
