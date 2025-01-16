@@ -174,6 +174,42 @@ class TweetCard extends StatefulWidget {
 class _TweetCardState extends State<TweetCard> {
   bool _showAllComments = false; // State untuk menampilkan semua komentar
 
+  Future<void> _confirmDeleteTweet() async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text(
+          'Hapus Tweet',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Apakah Anda yakin ingin menghapus tweet ini?',
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // Batal
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              await deleteTweet(); // Hapus tweet
+              Navigator.pop(context); // Tutup dialog
+            },
+            child: const Text(
+              'Hapus',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -213,27 +249,19 @@ class _TweetCardState extends State<TweetCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.tweet.username,
+                      '${widget.tweet.username} · ${getTimeAgo()}', // Gabungkan username dan waktu
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
-                    Text(
-                      '${user?.email ?? ''} · ${getTimeAgo()}',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                      ),
-                    ),
                   ],
                 ),
+                Spacer(),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    await deleteTweet();
-                  },
+                  onPressed: _confirmDeleteTweet, // Panggil fungsi konfirmasi
                 ),
               ],
             ),

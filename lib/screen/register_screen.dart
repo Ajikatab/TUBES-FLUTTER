@@ -14,33 +14,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   void _register() async {
     String email = _emailController.text;
     String password = _passwordController.text;
     String confirmPassword = _confirmPasswordController.text;
+    String username = _usernameController.text;
 
     if (_formKey.currentState?.validate() ?? false) {
       if (password == confirmPassword) {
         try {
-          // Mendaftarkan pengguna menggunakan Firebase Auth
           UserCredential userCredential =
               await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email,
             password: password,
           );
 
-          // Menyimpan data pengguna ke Firestore
-          FirebaseFirestore.instance
+          await FirebaseFirestore.instance
               .collection('user')
               .doc(userCredential.user?.uid)
               .set({
             'email': email,
+            'username': username,
             'created_at': FieldValue.serverTimestamp(),
           });
 
-          // Setelah berhasil registrasi, arahkan ke halaman login
+          // Notifikasi registrasi berhasil
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Registrasi berhasil!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -113,13 +123,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Column(
                             children: [
                               TextFormField(
+                                controller: _usernameController,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  labelText: 'Username',
+                                  labelStyle:
+                                      const TextStyle(color: Colors.amber),
+                                  prefixIcon: const Icon(Icons.person,
+                                      color: Colors.amber),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide:
+                                        const BorderSide(color: Colors.amber),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(
+                                        color: Colors.amber, width: 2),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Username tidak boleh kosong';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
                                 controller: _emailController,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
                                   labelText: 'Email',
                                   labelStyle:
                                       const TextStyle(color: Colors.amber),
-                                  prefixIcon: const Icon(Icons.person,
+                                  prefixIcon: const Icon(Icons.email,
                                       color: Colors.amber),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -146,13 +187,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               TextFormField(
                                 controller: _passwordController,
                                 style: const TextStyle(color: Colors.white),
-                                obscureText: true,
+                                obscureText: _obscurePassword,
                                 decoration: InputDecoration(
                                   labelText: 'Password',
                                   labelStyle:
                                       const TextStyle(color: Colors.amber),
                                   prefixIcon: const Icon(Icons.lock,
                                       color: Colors.amber),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.amber,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -178,13 +232,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               TextFormField(
                                 controller: _confirmPasswordController,
                                 style: const TextStyle(color: Colors.white),
-                                obscureText: true,
+                                obscureText: _obscureConfirmPassword,
                                 decoration: InputDecoration(
                                   labelText: 'Konfirmasi Password',
                                   labelStyle:
                                       const TextStyle(color: Colors.amber),
                                   prefixIcon: const Icon(Icons.lock,
                                       color: Colors.amber),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscureConfirmPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.amber,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureConfirmPassword =
+                                            !_obscureConfirmPassword;
+                                      });
+                                    },
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

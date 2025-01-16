@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
@@ -11,17 +12,43 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _emailOrUsernameController = TextEditingController(); // Ubah nama controller
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  bool _obscurePassword = true;
 
   void _login() async {
-    String email = _emailController.text;
+    String emailOrUsername = _emailOrUsernameController.text;
     String password = _passwordController.text;
 
     if (_formKey.currentState?.validate() ?? false) {
       try {
+        String email = emailOrUsername;
+
+        // Jika input bukan email, cari email berdasarkan username di Firestore
+        if (!emailOrUsername.contains('@')) {
+          QuerySnapshot userSnapshot = await _firestore
+              .collection('user')
+              .where('username', isEqualTo: emailOrUsername)
+              .limit(1)
+              .get();
+
+          if (userSnapshot.docs.isNotEmpty) {
+            email = userSnapshot.docs.first['email']; // Ambil email dari Firestore
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Username tidak ditemukan!'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+        }
+
+        // Login dengan email dan password
         await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
@@ -107,13 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Column(
                             children: [
                               TextFormField(
-                                controller: _emailController,
+                                controller: _emailOrUsernameController,
                                 style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
-                                  labelText: 'Email',
+                                  labelText: 'Email atau Username',
                                   labelStyle:
                                       const TextStyle(color: Colors.amber),
-                                  prefixIcon: const Icon(Icons.email,
+                                  prefixIcon: const Icon(Icons.person,
                                       color: Colors.amber),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -131,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Email tidak boleh kosong';
+                                    return 'Email atau username tidak boleh kosong';
                                   }
                                   return null;
                                 },
@@ -140,13 +167,26 @@ class _LoginScreenState extends State<LoginScreen> {
                               TextFormField(
                                 controller: _passwordController,
                                 style: const TextStyle(color: Colors.white),
-                                obscureText: true,
+                                obscureText: _obscurePassword,
                                 decoration: InputDecoration(
                                   labelText: 'Password',
                                   labelStyle:
                                       const TextStyle(color: Colors.amber),
                                   prefixIcon: const Icon(Icons.lock,
                                       color: Colors.amber),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.amber,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
