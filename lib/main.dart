@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
-import 'package:tubes/maps_screen.dart';
-import 'splash_screen.dart'; // Import splash screen
-import 'login_screen.dart'; // Import login screen
-import 'home_screen.dart'; // Import home screen
-import 'register_screen.dart'; // Import register screen
-import 'about.dart'; // Import about screen
-import 'news_screen.dart'; // Import news screen
+import 'package:tubes/screen/maps_screen.dart';
+import 'screen/splash_screen.dart'; // Import splash screen
+import 'screen/login_screen.dart'; // Import login screen
+import 'screen/home_screen.dart'; // Import home screen
+import 'screen/movie_screen.dart'; // Import movie screen (sebelumnya home_screen)
+import 'screen/register_screen.dart'; // Import register screen
+import 'screen/setting_screen.dart'; // Import about screen
+import 'screen/news_screen.dart'; // Import news screen
 
 void main() async {
   WidgetsFlutterBinding
@@ -44,13 +45,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(), // Initial screen shown is SplashScreen
       routes: {
-        '/home': (context) => const HomeScreen(), // Route for home screen
-        '/about': (context) => const AboutScreen(), // Route for about screen
+        '/home': (context) => const HomeScreen(), // Route for movie screen
+        '/movie': (context) => const MovieScreen(), // Route for movie screen
+        '/setting': (context) => const SettingScreen(), // Route for about screen
         '/login': (context) => const LoginScreen(), // Route for login screen
         '/register': (context) => const RegisterScreen(), // Route for register screen
         '/news': (context) => const NewsScreen(), // Route for news screen
-        '/maps': (context) => const MapsScreen(), // Route for news screen
-        
+        '/maps': (context) => const MapsScreen(), // Route for maps screen
       },
     );
   }

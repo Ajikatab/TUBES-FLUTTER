@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'news_api.dart';
-import 'news_detail.dart';
+import '../api/news_api.dart';
+import '../detailscreen/news_detail.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -38,7 +38,10 @@ class _NewsScreenState extends State<NewsScreen> {
       selectedCategory = categories[selectedSource]![0];
     }
     setState(() {
-      newsArticles = NewsApi().fetchNews(selectedSource, selectedCategory);
+      newsArticles = NewsApi().fetchNews(selectedSource, selectedCategory).catchError((error) {
+        // Handle error and return an empty list
+        return [];
+      });
     });
   }
 
@@ -152,17 +155,11 @@ class _NewsScreenState extends State<NewsScreen> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
                       ),
                     );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        'Error: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                    // Handle error or empty data
                     return const Center(
                       child: Text(
-                        'No news available',
+                        'No news',
                         style: TextStyle(color: Colors.white),
                       ),
                     );

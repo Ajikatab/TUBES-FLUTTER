@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart'; // Pastikan package di-import
 
 class MapsScreen extends StatefulWidget {
   const MapsScreen({super.key});
@@ -13,6 +14,7 @@ class MapsScreen extends StatefulWidget {
 class _MapsScreenState extends State<MapsScreen> {
   LatLng? _currentLocation;
   bool _isLoading = true;
+  String _currentAddress = "Mengambil lokasi...";
 
   @override
   void initState() {
@@ -59,10 +61,21 @@ class _MapsScreenState extends State<MapsScreen> {
       print('Getting current location...');
       Position position = await Geolocator.getCurrentPosition();
       print('Location obtained: ${position.latitude}, ${position.longitude}');
-      setState(() {
-        _currentLocation = LatLng(position.latitude, position.longitude);
-        _isLoading = false;
-      });
+
+      // Get address from coordinates
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks.first;
+        setState(() {
+          _currentLocation = LatLng(position.latitude, position.longitude);
+          _currentAddress = placemark.street ?? "Lokasi tidak diketahui";
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       print('Error getting location: $e');
       setState(() {
@@ -89,29 +102,55 @@ class _MapsScreenState extends State<MapsScreen> {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
               ),
             )
-          : FlutterMap(
-              options: MapOptions(
-                initialCenter: _currentLocation ?? LatLng(-6.2088, 106.8456),
-                initialZoom: 13.0,
-              ),
+          : Stack(
               children: [
-                TileLayer(
-                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      width: 40.0,
-                      height: 40.0,
-                      point: _currentLocation ?? LatLng(-6.2088, 106.8456),
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.red,
-                        size: 40,
-                      ),
+                FlutterMap(
+                  options: MapOptions(
+                    initialCenter: _currentLocation ?? LatLng(-6.2088, 106.8456),
+                    initialZoom: 13.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      subdomains: ['a', 'b', 'c'],
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          width: 40.0,
+                          height: 40.0,
+                          point: _currentLocation ?? LatLng(-6.2088, 106.8456),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                            size: 40,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
+                ),
+                Positioned(
+                  top: 16.0,
+                  left: 16.0,
+                  right: 16.0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      _currentAddress,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
