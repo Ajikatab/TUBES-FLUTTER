@@ -161,64 +161,28 @@ class TweetScreen extends StatelessWidget {
   }
 }
 
-class TweetCard extends StatelessWidget {
+class TweetCard extends StatefulWidget {
   final Tweet tweet;
   final FirebaseFirestore firestore;
 
   const TweetCard({super.key, required this.tweet, required this.firestore});
 
-  String getTimeAgo() {
-    final now = DateTime.now();
-    final difference = now.difference(tweet.timestamp.toDate());
-    if (difference.inDays > 0) return '${difference.inDays}d';
-    if (difference.inHours > 0) return '${difference.inHours}h';
-    if (difference.inMinutes > 0) return '${difference.inMinutes}m';
-    return 'now';
-  }
+  @override
+  _TweetCardState createState() => _TweetCardState();
+}
 
-  Future<void> toggleLike(String userId) async {
-    final tweetRef = firestore.collection('tweet').doc(tweet.id);
-
-    if (tweet.likes.contains(userId)) {
-      await tweetRef.update({
-        'likes': FieldValue.arrayRemove([userId])
-      });
-    } else {
-      await tweetRef.update({
-        'likes': FieldValue.arrayUnion([userId])
-      });
-    }
-  }
-
-  Future<void> addComment(String userId, String comment) async {
-    // Ambil data user dari Firestore
-    final userDoc = await firestore.collection('user').doc(userId).get();
-    final userData = userDoc.data() as Map<String, dynamic>;
-    final username = userData['username'] ?? 'Anonymous';
-
-    final tweetRef = firestore.collection('tweet').doc(tweet.id);
-
-    await tweetRef.update({
-      'comments': FieldValue.arrayUnion([
-        {
-          'userId': userId,
-          'username': username, // Tambah field username
-          'content': comment,
-          'timestamp': Timestamp.now(),
-        }
-      ])
-    });
-  }
-
-  Future<void> deleteTweet() async {
-    final tweetRef = firestore.collection('tweet').doc(tweet.id);
-    await tweetRef.delete();
-  }
+class _TweetCardState extends State<TweetCard> {
+  bool _showAllComments = false; // State untuk menampilkan semua komentar
 
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
     final userId = user?.uid ?? '';
+
+    // Ambil 2 komentar pertama jika tidak menampilkan semua komentar
+    final displayedComments = _showAllComments
+        ? widget.tweet.comments
+        : widget.tweet.comments.take(2).toList();
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -237,10 +201,11 @@ class TweetCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Bagian atas (foto profil, username, dll)
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(tweet.profileImage),
+                  backgroundImage: NetworkImage(widget.tweet.profileImage),
                   radius: 20,
                 ),
                 const SizedBox(width: 10),
@@ -248,7 +213,7 @@ class TweetCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tweet.username,
+                      widget.tweet.username,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -274,7 +239,7 @@ class TweetCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              tweet.content,
+              widget.tweet.content,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -282,11 +247,10 @@ class TweetCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Tombol Comment
                 IconButton(
-                  icon:
-                      const Icon(Icons.chat_bubble_outline, color: Colors.grey),
+                  icon: const Icon(Icons.chat_bubble_outline, color: Colors.grey),
                   onPressed: () {
                     // Show dialog to add comment
                     showDialog(
@@ -295,26 +259,35 @@ class TweetCard extends StatelessWidget {
                         final TextEditingController commentController =
                             TextEditingController();
                         return AlertDialog(
-                          title: const Text('Add Comment'),
+                          backgroundColor: const Color(0xFF1E1E1E),
+                          title: const Text('Tambah Komentar',
+                              style: TextStyle(color: Colors.white)),
                           content: TextField(
                             controller: commentController,
+                            style: const TextStyle(color: Colors.white),
                             decoration: const InputDecoration(
-                                hintText: 'Enter your comment'),
+                              hintText: 'Masukkan komentar Anda',
+                              hintStyle: TextStyle(color: Colors.grey),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.amber),
+                              ),
+                            ),
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
+                              child: const Text('Batal',
+                                  style: TextStyle(color: Colors.grey)),
                             ),
                             TextButton(
                               onPressed: () async {
                                 if (commentController.text.isNotEmpty) {
-                                  await addComment(
-                                      userId, commentController.text);
+                                  await addComment(userId, commentController.text);
                                   Navigator.pop(context);
                                 }
                               },
-                              child: const Text('Add'),
+                              child: const Text('Tambah',
+                                  style: TextStyle(color: Colors.amber)),
                             ),
                           ],
                         );
@@ -322,13 +295,14 @@ class TweetCard extends StatelessWidget {
                     );
                   },
                 ),
+                const SizedBox(width: 8), // Jarak antara tombol Comment dan Like
+                // Tombol Like
                 IconButton(
                   icon: Icon(
-                    tweet.likes.contains(userId)
+                    widget.tweet.likes.contains(userId)
                         ? Icons.favorite
                         : Icons.favorite_border,
-                    color:
-                        tweet.likes.contains(userId) ? Colors.red : Colors.grey,
+                    color: widget.tweet.likes.contains(userId) ? Colors.red : Colors.grey,
                   ),
                   onPressed: () {
                     toggleLike(userId);
@@ -341,12 +315,12 @@ class TweetCard extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    '${tweet.comments.length} Comments',
+                    '${widget.tweet.comments.length} Comments',
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                   const SizedBox(width: 20),
                   Text(
-                    '${tweet.likes.length} Likes',
+                    '${widget.tweet.likes.length} Likes',
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                 ],
@@ -354,7 +328,7 @@ class TweetCard extends StatelessWidget {
             ),
             const Divider(color: Colors.grey),
             // Menampilkan komentar
-            ...tweet.comments.map((comment) {
+            ...displayedComments.map((comment) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: Row(
@@ -388,9 +362,70 @@ class TweetCard extends StatelessWidget {
                 ),
               );
             }).toList(),
+            // Tombol "Lihat balasan lainnya" jika ada lebih dari 2 komentar
+            if (widget.tweet.comments.length > 2 && !_showAllComments)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _showAllComments = true; // Tampilkan semua komentar
+                  });
+                },
+                child: const Text(
+                  'Lihat balasan lainnya',
+                  style: TextStyle(color: Colors.amber),
+                ),
+              ),
           ],
         ),
       ),
     );
+  }
+
+  String getTimeAgo() {
+    final now = DateTime.now();
+    final difference = now.difference(widget.tweet.timestamp.toDate());
+    if (difference.inDays > 0) return '${difference.inDays}d';
+    if (difference.inHours > 0) return '${difference.inHours}h';
+    if (difference.inMinutes > 0) return '${difference.inMinutes}m';
+    return 'now';
+  }
+
+  Future<void> toggleLike(String userId) async {
+    final tweetRef = widget.firestore.collection('tweet').doc(widget.tweet.id);
+
+    if (widget.tweet.likes.contains(userId)) {
+      await tweetRef.update({
+        'likes': FieldValue.arrayRemove([userId])
+      });
+    } else {
+      await tweetRef.update({
+        'likes': FieldValue.arrayUnion([userId])
+      });
+    }
+  }
+
+  Future<void> addComment(String userId, String comment) async {
+    // Ambil data user dari Firestore
+    final userDoc = await widget.firestore.collection('user').doc(userId).get();
+    final userData = userDoc.data() as Map<String, dynamic>;
+    final username = userData['username'] ?? 'Anonymous';
+
+    final tweetRef = widget.firestore.collection('tweet').doc(widget.tweet.id);
+
+    await tweetRef.update({
+      'comments': FieldValue.arrayUnion([
+        {
+          'userId': userId,
+          'username': username, // Tambah field username
+          'content': comment,
+          'timestamp': Timestamp.now(),
+        }
+      ])
+    });
+  }
+
+  Future<void> deleteTweet() async {
+    final tweetRef = widget.firestore.collection('tweet').doc(widget.tweet.id);
+    await tweetRef.delete();
   }
 }

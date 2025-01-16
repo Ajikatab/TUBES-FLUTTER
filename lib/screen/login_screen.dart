@@ -27,7 +27,15 @@ class _LoginScreenState extends State<LoginScreen> {
           password: password,
         );
 
-        // If login is successful, navigate to HomeScreen
+        // Tampilkan notifikasi login berhasil
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigasi ke HomeScreen setelah login berhasil
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -35,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.message ?? 'Login Failed'),
+            content: Text(e.message ?? 'Login gagal'),
             backgroundColor: Colors.red,
           ),
         );
@@ -125,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (value == null || value.isEmpty) {
                                     return 'Email tidak boleh kosong';
                                   }
-                                  // You can also validate the email format here if needed
                                   return null;
                                 },
                               ),

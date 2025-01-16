@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:tubes/screen/maps_screen.dart';
 import 'movie_screen.dart'; // Import MovieScreen
 import 'news_screen.dart'; // Import NewsScreen
 import 'setting_screen.dart'; // Import SettingScreen
@@ -19,9 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const MovieScreen(), // Layar movie (indeks 0)
     const NewsScreen(), // Layar berita (indeks 1)
-    TweetScreen(
-        firestore: FirebaseFirestore.instance), // Layar tweet (indeks 2)
-    const SettingScreen(), // Layar setting (indeks 3)
+    TweetScreen(firestore: FirebaseFirestore.instance), // Layar tweet (indeks 2)
+    const MapsScreen(), // Layar setting (indeks 3)
+    const SettingScreen(), // Layar setting (indeks 4)
   ];
 
   @override
@@ -57,6 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Icon(Icons.newspaper,
               size: 30, color: Colors.white), // Ikon untuk NewsScreen
           Icon(Icons.home,
+              size: 30, color: Colors.white), // Ikon untuk TweetListScreen
+          Icon(Icons.map,
               size: 30, color: Colors.white), // Ikon untuk TweetListScreen
           Icon(Icons.settings,
               size: 30, color: Colors.white), // Ikon untuk SettingScreen

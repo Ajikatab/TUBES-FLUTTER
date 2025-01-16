@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
+import 'profile_screen.dart'; // Impor ProfileScreen
+import 'tentang_screen.dart'; // Impor AboutScreen
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -136,64 +138,6 @@ class _SettingScreenState extends State<SettingScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
-      appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF1E1E1E),
-      ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Ini adalah halaman profil pengguna.\n'
-            'Anda dapat mengedit informasi profil Anda di sini.',
-            style: TextStyle(fontSize: 16, color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
-      appBar: AppBar(
-        title: const Text(
-          'Tentang',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF1E1E1E),
-      ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Aplikasi ini dibuat untuk memberikan informasi terkini tentang film yang sedang tayang.\n\n'
-            'Nikmati pengalaman menonton yang lebih baik dengan fitur-fitur yang kami sediakan.',
-            style: TextStyle(fontSize: 16, color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
-        ),
       ),
     );
   }
