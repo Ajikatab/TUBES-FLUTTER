@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -11,50 +13,128 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
-        title: const Text('Settings'),
-        automaticallyImplyLeading: false, // Remove the back button
+        title: const Text(
+          'Settings',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF1E1E1E),
+        automaticallyImplyLeading: false,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           // Menu Profile
-          ListTile(
-            leading: const Icon(Icons.person, color: Colors.amber),
-            title: const Text(
-              'Profile',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            onTap: () {
-              // Navigate to Profile Screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
+          Card(
+            color: const Color(0xFF2C2C2C),
+            child: ListTile(
+              leading: const Icon(Icons.person, color: Colors.amber, size: 28),
+              title: const Text(
+                'Profile',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-              );
-            },
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+            ),
           ),
-          const Divider(color: Colors.grey), // Garis pemisah
+          const SizedBox(height: 8),
 
           // Menu Tentang
-          ListTile(
-            leading: const Icon(Icons.info, color: Colors.amber),
-            title: const Text(
-              'Tentang',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            onTap: () {
-              // Navigate to About Screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AboutScreen(),
+          Card(
+            color: const Color(0xFF2C2C2C),
+            child: ListTile(
+              leading: const Icon(Icons.info, color: Colors.amber, size: 28),
+              title: const Text(
+                'Tentang',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-              );
-            },
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutScreen(),
+                  ),
+                );
+              },
+            ),
           ),
-          const Divider(color: Colors.grey), // Garis pemisah
+          const SizedBox(height: 8),
+
+          // Tombol Logout
+          Card(
+            color: const Color(0xFF2C2C2C),
+            child: ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red, size: 28),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: const Color(0xFF2C2C2C),
+                      title: const Text(
+                        'Konfirmasi Logout',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      content: const Text(
+                        'Apakah Anda yakin ingin keluar?',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      actions: [
+                        TextButton(
+                          child: const Text('Batal'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
+                            // Implementasi logout di sini
+                            // Tambahkan navigasi ke halaman login
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -67,16 +147,21 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF1E1E1E),
       ),
       body: const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
-            'Ini adalah halaman profil pengguna. '
+            'Ini adalah halaman profil pengguna.\n'
             'Anda dapat mengedit informasi profil Anda di sini.',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16, color: Colors.white),
             textAlign: TextAlign.center,
           ),
         ),
@@ -91,16 +176,21 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
-        title: const Text('Tentang'),
+        title: const Text(
+          'Tentang',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF1E1E1E),
       ),
       body: const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
-            'Aplikasi ini dibuat untuk memberikan informasi terkini tentang film yang sedang tayang. '
+            'Aplikasi ini dibuat untuk memberikan informasi terkini tentang film yang sedang tayang.\n\n'
             'Nikmati pengalaman menonton yang lebih baik dengan fitur-fitur yang kami sediakan.',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16, color: Colors.white),
             textAlign: TextAlign.center,
           ),
         ),

@@ -3,8 +3,8 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'movie_screen.dart'; // Import MovieScreen
 import 'news_screen.dart'; // Import NewsScreen
 import 'setting_screen.dart'; // Import SettingScreen
-import 'maps_screen.dart'; // Import MapsScreen
 import 'tweet_screen.dart'; // Import TweetScreen
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,9 +19,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const MovieScreen(), // Layar movie (indeks 0)
     const NewsScreen(), // Layar berita (indeks 1)
-    const TweetListScreen(), // Layar tweet (indeks 2)
-    const MapsScreen(), // Layar peta (indeks 3)
-    const SettingScreen(), // Layar setting (indeks 4)
+    TweetScreen(
+        firestore: FirebaseFirestore.instance), // Layar tweet (indeks 2)
+    const SettingScreen(), // Layar setting (indeks 3)
   ];
 
   @override
@@ -52,11 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _currentIndex,
         height: 60.0,
         items: const <Widget>[
-          Icon(Icons.movie, size: 30, color: Colors.white), // Ikon untuk MovieScreen
-          Icon(Icons.newspaper, size: 30, color: Colors.white), // Ikon untuk NewsScreen
-          Icon(Icons.home, size: 30, color: Colors.white), // Ikon untuk TweetListScreen
-          Icon(Icons.map, size: 30, color: Colors.white), // Ikon untuk MapsScreen
-          Icon(Icons.settings, size: 30, color: Colors.white), // Ikon untuk SettingScreen
+          Icon(Icons.movie,
+              size: 30, color: Colors.white), // Ikon untuk MovieScreen
+          Icon(Icons.newspaper,
+              size: 30, color: Colors.white), // Ikon untuk NewsScreen
+          Icon(Icons.home,
+              size: 30, color: Colors.white), // Ikon untuk TweetListScreen
+          Icon(Icons.settings,
+              size: 30, color: Colors.white), // Ikon untuk SettingScreen
         ],
         color: const Color(0xFF1E1E1E),
         backgroundColor: Colors.transparent,
