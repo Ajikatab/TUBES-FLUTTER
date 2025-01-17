@@ -8,11 +8,23 @@ import 'screen/movie_screen.dart'; // Import movie screen (sebelumnya home_scree
 import 'screen/register_screen.dart'; // Import register screen
 import 'screen/setting_screen.dart'; // Import about screen
 import 'screen/news_screen.dart'; // Import news screen
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'services/notification_service.dart';
+
+// Handle background messages
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
 
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Pastikan widget binding sudah terinisialisasi
   await Firebase.initializeApp(); // Inisialisasi Firebase
+
+  // Initialize notifications
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await NotificationService().initialize();
+
   runApp(const MyApp());
 }
 
@@ -47,9 +59,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const HomeScreen(), // Route for movie screen
         '/movie': (context) => const MovieScreen(), // Route for movie screen
-        '/setting': (context) => const SettingScreen(), // Route for about screen
+        '/setting': (context) =>
+            const SettingScreen(), // Route for about screen
         '/login': (context) => const LoginScreen(), // Route for login screen
-        '/register': (context) => const RegisterScreen(), // Route for register screen
+        '/register': (context) =>
+            const RegisterScreen(), // Route for register screen
         '/news': (context) => const NewsScreen(), // Route for news screen
         '/maps': (context) => const MapsScreen(), // Route for maps screen
       },

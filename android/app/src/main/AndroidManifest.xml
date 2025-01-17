@@ -10,6 +10,9 @@
     <!-- Izin untuk membuka URL di aplikasi eksternal -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <application
         android:label="tubes"
         android:name="${applicationName}"

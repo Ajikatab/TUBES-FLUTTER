@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/notification_service.dart';
 
 class Tweet {
   final String id;
@@ -85,16 +86,31 @@ class TweetScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               if (contentController.text.isNotEmpty) {
+                // Simpan tweet ke Firestore
                 await firestore.collection('tweet').add({
                   'content': contentController.text,
-                  'name': username, // Gunakan username dari Firestore
-                  'username': username, // Gunakan username dari Firestore
+                  'name': username,
+                  'username': username,
                   'profileImage':
                       user.photoURL ?? 'https://via.placeholder.com/150',
                   'timestamp': Timestamp.now(),
                   'likes': [],
                   'comments': [],
                 });
+
+                // Kirim notifikasi ke pengguna lain
+                await NotificationService().sendTweetNotification(
+                  senderName: username,
+                  tweetContent: contentController.text,
+                  senderId: user.uid,
+                );
+
+                // Tampilkan notifikasi lokal untuk pengguna yang sedang login
+                await NotificationService().showLocalNotification(
+                  'Tweet Created',
+                  'Your tweet has been posted successfully!',
+                );
+
                 Navigator.pop(context);
               }
             },
@@ -278,7 +294,8 @@ class _TweetCardState extends State<TweetCard> {
               children: [
                 // Tombol Comment
                 IconButton(
-                  icon: const Icon(Icons.chat_bubble_outline, color: Colors.grey),
+                  icon:
+                      const Icon(Icons.chat_bubble_outline, color: Colors.grey),
                   onPressed: () {
                     // Show dialog to add comment
                     showDialog(
@@ -310,7 +327,8 @@ class _TweetCardState extends State<TweetCard> {
                             TextButton(
                               onPressed: () async {
                                 if (commentController.text.isNotEmpty) {
-                                  await addComment(userId, commentController.text);
+                                  await addComment(
+                                      userId, commentController.text);
                                   Navigator.pop(context);
                                 }
                               },
@@ -323,14 +341,17 @@ class _TweetCardState extends State<TweetCard> {
                     );
                   },
                 ),
-                const SizedBox(width: 8), // Jarak antara tombol Comment dan Like
+                const SizedBox(
+                    width: 8), // Jarak antara tombol Comment dan Like
                 // Tombol Like
                 IconButton(
                   icon: Icon(
                     widget.tweet.likes.contains(userId)
                         ? Icons.favorite
                         : Icons.favorite_border,
-                    color: widget.tweet.likes.contains(userId) ? Colors.red : Colors.grey,
+                    color: widget.tweet.likes.contains(userId)
+                        ? Colors.red
+                        : Colors.grey,
                   ),
                   onPressed: () {
                     toggleLike(userId);
