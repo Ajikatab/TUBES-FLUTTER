@@ -12,8 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailOrUsernameController =
-      TextEditingController(); // Ubah nama controller
+  final _emailOrUsernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
@@ -37,8 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
               .get();
 
           if (userSnapshot.docs.isNotEmpty) {
-            email =
-                userSnapshot.docs.first['email']; // Ambil email dari Firestore
+            email = userSnapshot.docs.first['email'];
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -110,10 +108,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        'assets/images/my_logo.jpg', // Path ke logo Anda
+                      // Logo dalam bentuk kotak
+                      Container(
                         width: 100,
                         height: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Warna latar belakang kotak
+                          borderRadius: BorderRadius.circular(12), // Sudut melengkung
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey[400]!.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 7,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12), // Sudut melengkung
+                          child: Image.asset(
+                            'assets/images/my_logo.jpg',
+                            fit: BoxFit.cover, // Pastikan gambar menutupi area kotak
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 24),
                       Text(

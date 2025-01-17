@@ -15,7 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = true;
-  bool _isEditing = false; // Tambahkan state untuk mode edit
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -26,23 +26,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserData() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      print('Current user: ${user?.uid}'); // Debug print
-
       if (user != null) {
         final userData = await FirebaseFirestore.instance
             .collection('user')
             .doc(user.uid)
             .get();
 
-        print('Firestore data: ${userData.data()}'); // Debug print
-
-        // Mengatur state bahkan jika data tidak ada
         setState(() {
           if (userData.exists) {
             _usernameController.text = userData.data()?['username'] ?? '';
             _emailController.text = userData.data()?['email'] ?? '';
           } else {
-            // Gunakan email dari Auth jika data Firestore belum ada
             _usernameController.text = user.displayName ?? '';
             _emailController.text = user.email ?? '';
           }
@@ -55,7 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
-      print('Error loading user data: $e'); // Debug print
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
@@ -70,17 +63,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final user = FirebaseAuth.instance.currentUser;
 
         if (user != null) {
-          // Update email di Authentication jika email berubah
           if (user.email != _emailController.text) {
             await user.updateEmail(_emailController.text);
           }
 
-          // Update password jika ada password baru
           if (_passwordController.text.isNotEmpty) {
             await user.updatePassword(_passwordController.text);
           }
 
-          // Update data di Firestore - mengubah 'users' menjadi 'user'
           await FirebaseFirestore.instance
               .collection('user')
               .doc(user.uid)
@@ -93,11 +83,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SnackBar(content: Text('Profil berhasil diperbarui')),
           );
 
-          // Keluar dari mode edit setelah menyimpan
           setState(() => _isEditing = false);
         }
       } catch (e) {
-        print('Error saving profile: $e'); // Debug print
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),
         );
@@ -122,197 +110,262 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text(
           'Profil',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
-          if (!_isEditing) // Tampilkan tombol edit jika tidak dalam mode edit
+          if (!_isEditing)
             IconButton(
-              icon: const Icon(Icons.edit, color: Colors.white),
-              onPressed: () {
-                setState(() => _isEditing = true); // Masuk ke mode edit
-              },
+              icon: const Icon(Icons.edit, color: Colors.amber),
+              onPressed: () => setState(() => _isEditing = true),
             ),
         ],
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: Colors.amber),
             )
           : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Bagian informasi profil saat ini
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[900],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Informasi Profil Saat Ini',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInfoRow('Username', _usernameController.text),
-                          const SizedBox(height: 8),
-                          _buildInfoRow('Email', _emailController.text),
+              child: Column(
+                children: [
+                  // Header dengan gradient
+                  Container(
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.amber.withOpacity(0.3),
+                          Colors.amber.withOpacity(0.1)
                         ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    // Form edit profil (hanya ditampilkan dalam mode edit)
-                    if (_isEditing)
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Text(
-                              'Edit Profil',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            const CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey,
-                              child: Icon(Icons.person,
-                                  size: 50, color: Colors.white),
-                            ),
-                            const SizedBox(height: 24),
-                            TextFormField(
-                              controller: _usernameController,
-                              style: const TextStyle(color: Colors.white),
-                              decoration: const InputDecoration(
-                                labelText: 'Username Baru',
-                                labelStyle: TextStyle(color: Colors.white),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.blue),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Username tidak boleh kosong';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _emailController,
-                              style: const TextStyle(color: Colors.white),
-                              decoration: const InputDecoration(
-                                labelText: 'Email Baru',
-                                labelStyle: TextStyle(color: Colors.white),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.blue),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Email tidak boleh kosong';
-                                }
-                                if (!value.contains('@')) {
-                                  return 'Email tidak valid';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _passwordController,
-                              style: const TextStyle(color: Colors.white),
-                              decoration: const InputDecoration(
-                                labelText: 'Password Baru',
-                                labelStyle: TextStyle(color: Colors.white),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.blue),
-                                ),
-                              ),
-                              obscureText: true,
-                              validator: (value) {
-                                if (value != null &&
-                                    value.isNotEmpty &&
-                                    value.length < 6) {
-                                  return 'Password minimal 6 karakter';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 24),
-                            ElevatedButton(
-                              onPressed: _saveProfile,
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                backgroundColor: Colors.blue,
-                              ),
-                              child: const Text(
-                                'Simpan Perubahan',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextButton(
-                              onPressed: () {
-                                setState(() => _isEditing = false); // Keluar dari mode edit
-                              },
-                              child: const Text(
-                                'Batal',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.amber.withOpacity(0.3),
+                          child: const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                  ],
-                ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _usernameController.text,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _emailController.text,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Konten profil
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        if (!_isEditing)
+                          _buildProfileInfoCard(),
+                        if (_isEditing)
+                          _buildEditForm(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 16,
+  Widget _buildProfileInfoCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: const Color(0xFF2A2A2A),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildInfoTile(
+              icon: Icons.person,
+              title: 'Username',
+              value: _usernameController.text,
+            ),
+            const Divider(color: Colors.grey, height: 16),
+            _buildInfoTile(
+              icon: Icons.email,
+              title: 'Email',
+              value: _emailController.text,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.amber.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: Colors.amber),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: Colors.grey[400],
+          fontSize: 14,
+        ),
+      ),
+      subtitle: Text(
+        value,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditForm() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: const Color(0xFF2A2A2A),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _usernameController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: const TextStyle(color: Colors.white),
+                  prefixIcon: Icon(Icons.person, color: Colors.amber),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber.withOpacity(0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Username tidak boleh kosong';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: const TextStyle(color: Colors.white),
+                  prefixIcon: Icon(Icons.email, color: Colors.amber),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber.withOpacity(0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Email tidak boleh kosong';
+                  }
+                  if (!value.contains('@')) {
+                    return 'Email tidak valid';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                style: const TextStyle(color: Colors.white),
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password Baru',
+                  labelStyle: const TextStyle(color: Colors.white),
+                  prefixIcon: Icon(Icons.lock, color: Colors.amber),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber.withOpacity(0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),
+                validator: (value) {
+                  if (value != null && value.isNotEmpty && value.length < 6) {
+                    return 'Password minimal 6 karakter';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _saveProfile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Simpan Perubahan',
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => setState(() => _isEditing = false),
+                child: const Text(
+                  'Batal',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

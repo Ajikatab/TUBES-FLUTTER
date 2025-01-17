@@ -59,11 +59,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const HomeScreen(), // Route for movie screen
         '/movie': (context) => const MovieScreen(), // Route for movie screen
-        '/setting': (context) =>
-            const SettingScreen(), // Route for about screen
+        '/setting': (context) => const SettingScreen(), // Route for about screen
         '/login': (context) => const LoginScreen(), // Route for login screen
-        '/register': (context) =>
-            const RegisterScreen(), // Route for register screen
+        '/register': (context) => const RegisterScreen(), // Route for register screen
         '/news': (context) => const NewsScreen(), // Route for news screen
         '/maps': (context) => const MapsScreen(), // Route for maps screen
       },

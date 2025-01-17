@@ -57,6 +57,8 @@ flutter:
 
   assets:
     - assets/images/my_logo.jpg
+    - assets/images/batman.jpg
+    - assets/images/rabbids.jpg
 
 # Optional: Add localization support if required
 # flutter_localizations:

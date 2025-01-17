@@ -78,10 +78,13 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Gunakan Container untuk membuat logo kotak
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    width: 120,
+                    height: 120,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      color: Colors.white, // Warna latar belakang kotak
+                      borderRadius: BorderRadius.circular(12), // Sudut melengkung
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey[400]!.withOpacity(0.5),
@@ -90,10 +93,12 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ],
                     ),
-                    child: Image.asset(
-                      'assets/images/my_logo.jpg',
-                      width: 120,
-                      height: 120,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12), // Sudut melengkung
+                      child: Image.asset(
+                        'assets/images/my_logo.jpg',
+                        fit: BoxFit.cover, // Pastikan gambar menutupi area kotak
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
