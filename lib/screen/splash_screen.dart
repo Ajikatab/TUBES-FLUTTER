@@ -8,7 +8,8 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -97,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   const SizedBox(height: 30),
                   const Text(
-                    'Silver Screen Saga',
+                    'DailyVibe',
                     style: TextStyle(
                       fontSize: 36,
                       color: Color(0xFFE0E0E0),
@@ -107,7 +108,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Your Premium Cinema Experience',
+                    'Stay Connected, Stay Vibrant',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[400],
@@ -116,7 +117,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   const SizedBox(height: 40),
                   CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[300]!),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.grey[300]!),
                   ),
                 ],
               ),

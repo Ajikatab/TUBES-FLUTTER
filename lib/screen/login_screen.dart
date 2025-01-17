@@ -12,7 +12,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailOrUsernameController = TextEditingController(); // Ubah nama controller
+  final _emailOrUsernameController =
+      TextEditingController(); // Ubah nama controller
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
@@ -36,7 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
               .get();
 
           if (userSnapshot.docs.isNotEmpty) {
-            email = userSnapshot.docs.first['email']; // Ambil email dari Firestore
+            email =
+                userSnapshot.docs.first['email']; // Ambil email dari Firestore
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -115,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'Silver Screen Saga',
+                        'DailyVibe',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
