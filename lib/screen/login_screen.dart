@@ -110,10 +110,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.movie,
-                        size: 100,
-                        color: Colors.grey[300],
+                      Image.asset(
+                        'assets/images/my_logo.jpg', // Path ke logo Anda
+                        width: 100,
+                        height: 100,
                       ),
                       const SizedBox(height: 24),
                       Text(

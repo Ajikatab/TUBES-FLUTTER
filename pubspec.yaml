@@ -55,6 +55,9 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
 
+  assets:
+    - assets/images/my_logo.jpg
+
 # Optional: Add localization support if required
 # flutter_localizations:
 #   sdk: flutter

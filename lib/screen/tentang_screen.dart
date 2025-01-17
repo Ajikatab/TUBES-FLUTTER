@@ -19,7 +19,8 @@ class AboutScreen extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child: Text(
             'Aplikasi ini dibuat untuk memberikan informasi terkini tentang film yang sedang tayang.\n\n'
-            'Nikmati pengalaman menonton yang lebih baik dengan fitur-fitur yang kami sediakan.',
+            'Nikmati pengalaman menonton yang lebih baik dengan fitur-fitur yang kami sediakan.\n\n'
+            'Dibuat oleh Fatururohman Fahrizi Katab 152022072 dan Davney Restra Danaz 152022069.',
             style: TextStyle(fontSize: 16, color: Colors.white),
             textAlign: TextAlign.center,
           ),

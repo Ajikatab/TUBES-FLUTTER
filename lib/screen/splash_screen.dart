@@ -90,10 +90,10 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.movie_creation,
-                      size: 120,
-                      color: Colors.grey[300],
+                    child: Image.asset(
+                      'assets/images/my_logo.jpg',
+                      width: 120,
+                      height: 120,
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -104,15 +104,6 @@ class _SplashScreenState extends State<SplashScreen>
                       color: Color(0xFFE0E0E0),
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Stay Connected, Stay Vibrant',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[400],
-                      letterSpacing: 1,
                     ),
                   ),
                   const SizedBox(height: 40),
