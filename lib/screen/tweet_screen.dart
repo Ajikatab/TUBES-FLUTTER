@@ -12,6 +12,7 @@ class Tweet {
   final List<String> likes;
   final List<dynamic> comments;
   final Timestamp timestamp;
+  final String userId; // Tambahkan field userId
 
   Tweet({
     required this.id,
@@ -22,6 +23,7 @@ class Tweet {
     required this.likes,
     required this.comments,
     required this.timestamp,
+    required this.userId, // Tambahkan field userId
   });
 
   factory Tweet.fromFirestore(DocumentSnapshot doc) {
@@ -35,6 +37,7 @@ class Tweet {
       likes: List<String>.from(data['likes'] ?? []),
       comments: data['comments'] ?? [],
       timestamp: data['timestamp'] ?? Timestamp.now(),
+      userId: data['userId'] ?? '', // Ambil userId dari Firestore
     );
   }
 }
@@ -64,8 +67,7 @@ class TweetScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E1E),
-        title: const Text('Buat Tweet Baru',
-            style: TextStyle(color: Colors.white)),
+        title: const Text('Buat Tweet Baru', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: contentController,
           style: const TextStyle(color: Colors.white),
@@ -91,11 +93,11 @@ class TweetScreen extends StatelessWidget {
                   'content': contentController.text,
                   'name': username,
                   'username': username,
-                  'profileImage':
-                      user.photoURL ?? 'https://via.placeholder.com/150',
+                  'profileImage': user.photoURL ?? 'https://via.placeholder.com/150',
                   'timestamp': Timestamp.now(),
                   'likes': [],
                   'comments': [],
+                  'userId': user.uid, // Simpan userId pembuat tweet
                 });
 
                 // Kirim notifikasi ke pengguna lain
@@ -275,10 +277,12 @@ class _TweetCardState extends State<TweetCard> {
                   ],
                 ),
                 Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: _confirmDeleteTweet, // Panggil fungsi konfirmasi
-                ),
+                // Hanya tampilkan tombol hapus jika userId sama dengan pembuat tweet
+                if (widget.tweet.userId == userId)
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: _confirmDeleteTweet, // Panggil fungsi konfirmasi
+                  ),
               ],
             ),
             const SizedBox(height: 10),
@@ -474,7 +478,10 @@ class _TweetCardState extends State<TweetCard> {
   }
 
   Future<void> deleteTweet() async {
-    final tweetRef = widget.firestore.collection('tweet').doc(widget.tweet.id);
-    await tweetRef.delete();
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && widget.tweet.userId == user.uid) {
+      final tweetRef = widget.firestore.collection('tweet').doc(widget.tweet.id);
+      await tweetRef.delete();
+    }
   }
 }
